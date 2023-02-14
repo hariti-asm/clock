@@ -27,28 +27,42 @@ export default function Home() {
       setSessionLength(sessionLength - 1);
     }
   };
-  // let intervalId: number | null;
-  // let setIntervalId: number | null;
 
-  // useEffect(() => {
-  //   if (isRunning) {
-  //     setIntervalId(
-  //       setInterval(() => {
-  //         setTime((time) => {
-  //           return time - 1;
-  //         });
-  //       }, 1000)
-  //     );
-  //   } else if (!isRunning && time !== 0) {
-  //     clearInterval(intervalId);
-  //   }
-  //   return () => {
-  //     clearInterval(intervalId);
-  //   };
-  // }, [isRunning, time]);
+  useEffect(() => {
+    let intervalId: ReturnType<typeof setInterval>;
+
+    if (isRunning) {
+      intervalId = setInterval(() => {
+        if (time == 0) {
+          clearInterval(intervalId);
+          return;
+        }
+        setTime((time) => {
+          return time - 1;
+        });
+      }, 1000);
+
+      return () => {
+        clearInterval(intervalId);
+      };
+    } else {
+      //@ts-ignore
+      clearInterval(intervalId);
+    }
+
+    if (isRunning && time == 0) {
+      const audio = new Audio(
+        "https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
+      );
+      audio.play();
+    }
+  }, [isRunning, time]);
 
   const startCounting = () => {
-    setIsRunning(true);
+    if (!isRunning) {
+      setIsRunning(true);
+      setTime(sessionLength * 60);
+    }
   };
 
   const stopCounting = () => {
@@ -58,6 +72,8 @@ export default function Home() {
   const reset = () => {
     setSessionLength(25);
     setBreakLength(5);
+    setTime(25 * 60);
+    setIsRunning(false);
   };
 
   return (
@@ -128,16 +144,16 @@ export default function Home() {
       </div>
       <div className="flex justify-center pt-12 gap-12">
         <Image
-          id="start"
-          src="/play.svg"
+          id="pause"
+          src="/pause.svg"
           alt=""
           width={30}
           height={30}
-          onClick={startCounting}
+          onClick={stopCounting}
         ></Image>
         <Image
-          id="pause"
-          src="/pause.svg"
+          id="play"
+          src="/play.svg"
           alt=""
           width={30}
           height={30}
@@ -152,6 +168,11 @@ export default function Home() {
           alt=""
         ></Image>
       </div>
+      <h1 className="text-xl text-center text-red-600">
+        {" "}
+        Designed and Coded by
+      </h1>
+      <h1 className=" text-white italic text-center text-xl ">Hariti asmae</h1>
     </main>
   );
 }
