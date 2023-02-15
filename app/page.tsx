@@ -1,9 +1,9 @@
-'use client';
-import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
+"use client";
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
 export default function Home() {
   const [breakLength, setBreakLength] = useState(5);
-  const [sessionLength, setSessionLength] = useState(0.1);
+  const [sessionLength, setSessionLength] = useState(25);
   const [time, setTime] = useState(sessionLength * 60);
   //timer in js works with ms
   const [isRunning, setIsRunning] = useState(true);
@@ -35,7 +35,7 @@ export default function Home() {
     let intervalId = setInterval(() => {
       if (time == 0) {
         const audio = new Audio(
-          'https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav'
+          "https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
         );
         audio.play();
         clearInterval(intervalId);
@@ -56,23 +56,30 @@ export default function Home() {
   ]);
 
   const startCounting = () => {
-    console.log('startCounting');
+    console.log("startCounting");
     setIsRunning(true);
   };
 
   const stopCounting = () => {
-    console.log('stopCounting');
+    console.log("stopCounting");
     setIsRunning(false);
   };
 
   const reset = () => {
-    console.log('reset');
+    console.log("reset");
     setSessionLength(25);
     setBreakLength(5);
     setTime(25 * 60);
     setIsRunning(false);
   };
 
+  const formatTime = (timeInSeconds: number) => {
+    const minutes = Math.floor(timeInSeconds / 60)
+      .toString()
+      .padStart(2, "0");
+    const seconds = (timeInSeconds % 60).toString().padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  };
   return (
     <main>
       <h1 className="font-bold  px-16  pb-20 text-3xl text-center mt-40 ">
@@ -137,7 +144,9 @@ export default function Home() {
       ></div>
       <div className="h-60 w-[500px]  border-4 border-indigo-600 rounded-3xl m-auto flex flex-col items-center justify-center">
         <label className="text-center font-semibold text-3xl">Session</label>
-        <span className="text-center font-semibold text-3xl mt-3">{`${time}`}</span>
+        <span className="text-center font-semibold text-3xl mt-3">{`${formatTime(
+          time
+        )}`}</span>
       </div>
       <div className="flex justify-center pt-12 gap-12">
         <Image
