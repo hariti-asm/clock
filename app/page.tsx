@@ -5,26 +5,35 @@ export default function Home() {
   const [breakLength, setBreakLength] = useState(5);
   const [sessionLength, setSessionLength] = useState(25);
   const [time, setTime] = useState(sessionLength * 60);
+  const [hidden, sethidden] = useState(true);
   //timer in js works with ms
   const [isRunning, setIsRunning] = useState(true);
 
   const incrementBreak = () => {
-    setBreakLength(breakLength + 1);
+    if (!isRunning) {
+      const newLength = Math.min(breakLength + 1, 60);
+      setBreakLength(newLength);
+    }
   };
 
   const decrementBreak = () => {
-    if (breakLength > 1) {
+    if (!isRunning && breakLength > 1) {
       setBreakLength(breakLength - 1);
     }
   };
 
   const incrementSession = () => {
-    setSessionLength(sessionLength + 1);
+    if (!isRunning) {
+      const newLength = Math.min(sessionLength + 1, 60);
+      setSessionLength(newLength);
+      setTime(newLength * 60);
+    }
   };
 
   const decrementSession = () => {
-    if (sessionLength > 1) {
+    if (!isRunning && sessionLength > 1) {
       setSessionLength(sessionLength - 1);
+      setTime((sessionLength - 1) * 60);
     }
   };
 
@@ -54,7 +63,11 @@ export default function Home() {
     // time dependency is needed for the audio to play
     time,
   ]);
-
+  // useEffect(() => {
+  //   if (sessionLength == 0) {
+  //     sethidden(true);
+  //   }
+  // });
   const startCounting = () => {
     console.log("startCounting");
     setIsRunning(true);
@@ -144,9 +157,10 @@ export default function Home() {
       ></div>
       <div className="h-60 w-[500px]  border-4 border-indigo-600 rounded-3xl m-auto flex flex-col items-center justify-center">
         <label className="text-center font-semibold text-3xl">Session</label>
-        <span className="text-center font-semibold text-3xl mt-3">{`${formatTime(
-          time
-        )}`}</span>
+        <span
+          className="text-center font-semibold text-3xl mt-3"
+          id="time-left"
+        >{`${formatTime(time)}`}</span>
       </div>
       <div className="flex justify-center pt-12 gap-12">
         <Image
