@@ -1,9 +1,9 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
+'use client';
+import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 export default function Home() {
   const [breakLength, setBreakLength] = useState(5);
-  const [sessionLength, setSessionLength] = useState(25);
+  const [sessionLength, setSessionLength] = useState(0.1);
   const [time, setTime] = useState(sessionLength * 60);
   //timer in js works with ms
   const [isRunning, setIsRunning] = useState(true);
@@ -29,47 +29,44 @@ export default function Home() {
   };
 
   useEffect(() => {
-    let intervalId: ReturnType<typeof setInterval>;
+    // if the timer is not running, nothing to do here
+    if (!isRunning) return;
 
-    if (isRunning) {
-      intervalId = setInterval(() => {
-        if (time == 0) {
-          clearInterval(intervalId);
-          return;
-        }
+    let intervalId = setInterval(() => {
+      if (time == 0) {
+        const audio = new Audio(
+          'https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav'
+        );
+        audio.play();
+        clearInterval(intervalId);
+      } else {
         setTime((time) => {
           return time - 1;
         });
-      }, 1000);
+      }
+    }, 1000);
 
-      return () => {
-        clearInterval(intervalId);
-      };
-    } else {
-      //@ts-ignore
+    return () => {
       clearInterval(intervalId);
-    }
-
-    if (isRunning && time == 0) {
-      const audio = new Audio(
-        "https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
-      );
-      audio.play();
-    }
-  }, [isRunning, time]);
+    };
+  }, [
+    isRunning,
+    // time dependency is needed for the audio to play
+    time,
+  ]);
 
   const startCounting = () => {
-    if (!isRunning) {
-      setIsRunning(true);
-      setTime(sessionLength * 60);
-    }
+    console.log('startCounting');
+    setIsRunning(true);
   };
 
   const stopCounting = () => {
+    console.log('stopCounting');
     setIsRunning(false);
   };
 
   const reset = () => {
+    console.log('reset');
     setSessionLength(25);
     setBreakLength(5);
     setTime(25 * 60);
@@ -140,7 +137,7 @@ export default function Home() {
       ></div>
       <div className="h-60 w-[500px]  border-4 border-indigo-600 rounded-3xl m-auto flex flex-col items-center justify-center">
         <label className="text-center font-semibold text-3xl">Session</label>
-        <span className="text-center font-semibold text-3xl mt-3">{`${sessionLength}:00`}</span>
+        <span className="text-center font-semibold text-3xl mt-3">{`${time}`}</span>
       </div>
       <div className="flex justify-center pt-12 gap-12">
         <Image
@@ -169,7 +166,6 @@ export default function Home() {
         ></Image>
       </div>
       <h1 className="text-xl text-center text-red-600">
-        {" "}
         Designed and Coded by
       </h1>
       <h1 className=" text-white italic text-center text-xl ">Hariti asmae</h1>
