@@ -2,9 +2,9 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 export default function Home() {
-  const [breakLength, setBreakLength] = useState(0.1);
+  const [breakLength, setBreakLength] = useState(5);
   const [breakTime, setBreakTime] = useState(breakLength * 60);
-  const [sessionLength, setSessionLength] = useState(0.1);
+  const [sessionLength, setSessionLength] = useState(25);
   const [time, setTime] = useState(sessionLength * 60);
   //timer in js works with ms
   const [isRunning, setIsRunning] = useState(true);
