@@ -2,56 +2,51 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 export default function Home() {
-  const [breakLength, setBreakLength] = useState(5);
-  const [sessionLength, setSessionLength] = useState(25);
+  const [breakLength, setBreakLength] = useState(0.1);
+  const [breakTime, setBreakTime] = useState(breakLength * 60);
+  const [sessionLength, setSessionLength] = useState(0.1);
   const [time, setTime] = useState(sessionLength * 60);
   //timer in js works with ms
   const [isRunning, setIsRunning] = useState(true);
 
   const incrementBreak = () => {
     if (!isRunning) {
-      const newLength = Math.min(breakLength + 1, 60);
+      const newLength = Math.min(breakTime + 1, 60);
       setBreakLength(newLength);
     }
   };
 
   const decrementBreak = () => {
-    if (!isRunning && breakLength > 1) {
-      setBreakLength(breakLength - 1);
-      setTime((breakLength - 1) * 60);
+    if (!isRunning && breakTime > 1) {
+      setBreakLength(breakTime - 1);
     }
   };
-  // const decrementTime = () => {
-  //   if (time > 0) {
-  //     setTime(time - 1);
-  //   }
-  // };
+
   const incrementSession = () => {
     if (!isRunning) {
       const newLength = Math.min(sessionLength + 1, 60);
       setSessionLength(newLength);
-      setTime(newLength * 60);
     }
   };
 
   const decrementSession = () => {
     if (!isRunning && sessionLength > 1) {
       setSessionLength(sessionLength - 1);
-      setTime((sessionLength - 1) * 60);
     }
   };
 
   useEffect(() => {
     // if the timer is not running, nothing to do here
-    if (!isRunning) return;
+    if (!isRunning || isBreak) return;
 
     let intervalId = setInterval(() => {
       if (time == 0) {
         const audio = new Audio(
           "https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
         );
-        audio.play();
         clearInterval(intervalId);
+        setIsBreak(true);
+        audio.play();
       } else {
         setTime((time) => {
           return time - 1;
@@ -81,7 +76,7 @@ export default function Home() {
   const reset = () => {
     console.log("reset");
     setSessionLength(25);
-    setBreakLength(5);
+    setBreakTime(5);
     setTime(25 * 60);
     setIsRunning(false);
   };
@@ -97,15 +92,21 @@ export default function Home() {
   const [isBreak, setIsBreak] = useState(false);
 
   const BreakD = () => {
-    setBreakLength((prevLength) => prevLength - 1);
+    setBreakTime((prevLength) => prevLength - 1);
   };
 
   useEffect(() => {
-    if (isBreak) {
+    if (isBreak && isRunning) {
+      if (breakTime <= 0) {
+        setIsBreak(false);
+        setIsRunning(false);
+        return;
+      }
+
       const breakTimer = setInterval(BreakD, 1000);
       return () => clearInterval(breakTimer);
     }
-  }, [isBreak]);
+  }, [isBreak, breakTime]);
   return (
     <main>
       <h1 className="font-bold  px-16  pb-20 text-3xl text-center mt-40 ">
@@ -177,7 +178,7 @@ export default function Home() {
             <span
               className="text-center  text-red-600 font-semibold text-3xl mt-3"
               id="time-left"
-            >{`${formatTime(breakLength)}`}</span>
+            >{`${formatTime(breakTime)}`}</span>
           </React.Fragment>
         ) : (
           <React.Fragment>
